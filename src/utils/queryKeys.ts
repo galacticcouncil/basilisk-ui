@@ -174,4 +174,5 @@ export const QUERY_KEYS = {
     walletAddress,
   ],
   polkadotAccounts: ["polkadotAccounts"],
+  potTransfers: (address: string) => ["potTransfers", address],
 } as const

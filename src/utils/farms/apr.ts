@@ -1,12 +1,14 @@
 import * as liquidityMining from "@galacticcouncil/math-liquidity-mining"
 import { AccountId32 } from "@polkadot/types/interfaces/runtime"
 import { PalletLiquidityMiningLoyaltyCurve } from "@polkadot/types/lookup"
+import { useAccountsBalances } from "api/accountBalances"
 import { useBestNumber } from "api/chain"
 import { useFarms } from "api/farms"
 import BigNumber from "bignumber.js"
 import { secondsInYear } from "date-fns"
+import { NATIVE_ASSET_ID } from "utils/api"
 import { BLOCK_TIME, BN_0, BN_1, BN_QUINTILL } from "utils/constants"
-import { useQueryReduce } from "utils/helpers"
+import { isNotNil, useQueryReduce } from "utils/helpers"
 
 export type AprFarm = NonNullable<
   Exclude<ReturnType<typeof useAPR>["data"], undefined>[number]
@@ -16,11 +18,17 @@ export const useAPR = (poolId: AccountId32 | string) => {
   const bestNumber = useBestNumber()
   const poolFarms = useFarms([poolId])
 
+  const potAddresses =
+    poolFarms.data?.map((farm) => farm.globalFarmPotAddress).filter(isNotNil) ??
+    []
+
+  const balances = useAccountsBalances(potAddresses)
+
   return useQueryReduce(
     [bestNumber, poolFarms] as const,
     (bestNumber, poolFarms) => {
       const data = poolFarms.map((farm) => {
-        const { globalFarm, yieldFarm } = farm
+        const { globalFarm, yieldFarm, globalFarmPotAddress } = farm
 
         const loyaltyFactor = yieldFarm.loyaltyCurve.isNone
           ? BN_1
@@ -101,14 +109,32 @@ export const useAPR = (poolId: AccountId32 | string) => {
           .times(yieldPerPeriod)
           .div(maxRewardPerPeriod)
 
+        const rewardCurrency = globalFarm.rewardCurrency.toString()
+        const accountBalance = balances.find(
+          (balance) => balance.data?.address === globalFarmPotAddress,
+        )
+
+        const maxReward = accountBalance
+          ? rewardCurrency === NATIVE_ASSET_ID
+            ? accountBalance.data?.native.data.free.toBigNumber()
+            : accountBalance.data?.balances
+                .find((balance) => balance.id.toString() === rewardCurrency)
+                ?.data.free.toBigNumber()
+          : undefined
+
+        const potMaxBalance = maxReward
+          ? distributedRewards.plus(maxReward)
+          : undefined
+
         return {
           minApr,
           apr,
           distributedRewards,
           maxRewards,
+          potMaxBalance,
           fullness,
           estimatedEndBlock: estimatedEndBlock,
-          assetId: globalFarm.rewardCurrency,
+          assetId: rewardCurrency,
           currentPeriod,
           loyaltyCurve,
           ...farm,

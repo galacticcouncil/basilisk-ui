@@ -16,7 +16,8 @@ export const formatNum = (
 
   try {
     const n = typeof number === "number" ? number : parseFloat(number)
-    return new Intl.NumberFormat(locales, options).format(n)
+
+    return new Intl.NumberFormat(locales, options).format(Math.ceil(n))
   } catch (err) {
     return null
   }

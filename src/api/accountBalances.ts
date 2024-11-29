@@ -1,6 +1,6 @@
 import { AccountId32 } from "@polkadot/types/interfaces"
 import { NATIVE_ASSET_ID, useApiPromise } from "utils/api"
-import { useQuery } from "@tanstack/react-query"
+import { useQueries, useQuery } from "@tanstack/react-query"
 import { QUERY_KEYS } from "utils/queryKeys"
 import { ApiPromise } from "@polkadot/api"
 import { Maybe, undefinedNoop } from "utils/helpers"
@@ -18,6 +18,23 @@ export const useAccountBalances = (id: Maybe<AccountId32 | string>) => {
     !!id ? getAccountBalances(api, id) : undefinedNoop,
     { enabled: id != null },
   )
+}
+
+export const useAccountsBalances = (addresses: string[]) => {
+  const { api } = useApiPromise()
+
+  return useQueries({
+    queries: addresses.map((address) => ({
+      queryKey: QUERY_KEYS.accountBalances(address),
+      queryFn:  async () => {
+       const data = await getAccountBalances(api, address)()
+
+       return {...data, address}
+      },
+      enabled: !!address,
+    })),
+  })
+
 }
 
 const getAccountBalances =

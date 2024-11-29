@@ -91,7 +91,7 @@ export const PoolFarmDetail = (props: {
         <SFarmRow>
           <FillBar
             percentage={props.farm.distributedRewards
-              .div(props.farm.maxRewards)
+              .div(props.farm.potMaxBalance ?? props.farm.maxRewards)
               .times(100)
               .toNumber()}
           />
@@ -104,7 +104,10 @@ export const PoolFarmDetail = (props: {
                   props.farm.distributedRewards,
                   12,
                 ),
-                max: getFloatingPointAmount(props.farm.maxRewards, 12),
+                max: getFloatingPointAmount(
+                  props.farm.potMaxBalance ?? props.farm.maxRewards,
+                  12,
+                ),
               }}
             >
               <Text as="span" fs={14} color="neutralGray100" />
