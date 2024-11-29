@@ -2,7 +2,7 @@ import { useAssetMeta } from "./assetMeta"
 import { useAssetDetails, useAssetDetailsList } from "./assetDetails"
 import { getAssetLogo } from "components/AssetIcon/AssetIcon"
 import { u32 } from "@polkadot/types"
-import { Maybe, useQueryReduce, useQuerySelect } from "utils/helpers"
+import { Maybe, useQueryReduce } from "utils/helpers"
 import { TradeRouter } from "@galacticcouncil/sdk"
 import { useApiPromise } from "utils/api"
 import { useQuery } from "@tanstack/react-query"
@@ -24,13 +24,15 @@ export const useAsset = (id: Maybe<u32 | string>) => {
 }
 
 export const useUsdPeggedAsset = () => {
-  return useQuerySelect(useAssetDetailsList(), (data) =>
-    data.find(
-      (asset) =>
-        asset.symbol.toLowerCase() ===
-        import.meta.env.VITE_USD_PEGGED_ASSET_NAME.toLowerCase(),
-    ),
+  const assets = useAssetDetailsList()
+
+  const usdId = assets.data?.find(
+    (asset) =>
+      asset.symbol.toLowerCase() ===
+      import.meta.env.VITE_USD_PEGGED_ASSET_NAME.toLowerCase(),
   )
+
+  return usdId?.id ?? ""
 }
 
 export const useTradeAssets = () => {

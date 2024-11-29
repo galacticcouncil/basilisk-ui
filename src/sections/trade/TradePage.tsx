@@ -12,6 +12,9 @@ import { z } from "zod"
 import { MakeGenerics, useSearch } from "@tanstack/react-location"
 import { useProviderRpcUrlStore } from "api/provider"
 import { useApiPromise } from "utils/api"
+import { useUsdSpotPrice } from "api/spotPrice"
+import { useSpotPrice } from "../../api/spotPrice"
+import { useUsdPeggedAsset } from "api/asset"
 
 export const TradeApp = createComponent({
   tagName: "gc-trade",
@@ -40,6 +43,14 @@ type SearchGenerics = MakeGenerics<{
 const grafanaUrl = import.meta.env.VITE_GRAFANA_URL
 const grafanaDsn = import.meta.env.VITE_GRAFANA_DSN
 
+export const TradeWrapper = () => {
+  const { isLoaded } = useApiPromise()
+
+  if (!isLoaded) return null
+
+  return <TradePage />
+}
+
 export function TradePage() {
   const { api } = useApiPromise()
   const { account } = useAccountStore()
@@ -50,6 +61,12 @@ export function TradePage() {
   const rawSearch = useSearch<SearchGenerics>()
   const usdAssetId = import.meta.env.VITE_USD_PEGGED_ASSET_ID
   const search = TradeAppSearch.safeParse(rawSearch)
+  const peggedAssetId = useUsdPeggedAsset()
+
+  const usdPrice = useUsdSpotPrice(peggedAssetId)
+  const spotPrice = useSpotPrice(peggedAssetId, usdAssetId)
+
+  const rate = usdPrice.data?.spotPrice.div(spotPrice.data?.spotPrice ?? 1)
 
   const handleSubmit = async (e: CustomEvent<TxInfo>) => {
     const { transaction, notification } = e.detail
@@ -110,6 +127,7 @@ export function TradePage() {
           grafanaUrl={grafanaUrl}
           grafanaDsn={grafanaDsn}
           stableCoinAssetId={usdAssetId}
+          stableCoindRate={rate?.toString()}
           assetIn={assetIn}
           assetOut={assetOut}
         />

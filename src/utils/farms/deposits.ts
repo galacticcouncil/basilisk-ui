@@ -1,4 +1,3 @@
-import { useUsdPeggedAsset } from "api/asset"
 import {
   DepositNftType,
   useAccountDepositIds,
@@ -6,7 +5,7 @@ import {
   useDeposits,
 } from "api/deposits"
 import { usePools, usePoolShareToken, usePoolShareTokens } from "api/pools"
-import { useSpotPrices } from "api/spotPrice"
+import { useUsdSpotPrices } from "api/spotPrice"
 import { useTotalIssuance, useTotalIssuances } from "api/totalIssuance"
 import BigNumber from "bignumber.js"
 import { useMemo } from "react"
@@ -90,13 +89,11 @@ export const useDepositValues = (depositNft: DepositNftType) => {
     ...(pool?.tokens.map((t) => t.id) ?? []),
   ])
 
-  const usd = useUsdPeggedAsset()
-  const spotPrices = useSpotPrices(
+  const spotPrices = useUsdSpotPrices(
     pool?.tokens.map((token) => token.id) ?? [],
-    usd.data?.id,
   )
 
-  const queries = [pools, shareToken, usd, ...totalIssuances, ...spotPrices]
+  const queries = [pools, shareToken, ...totalIssuances, ...spotPrices]
   const isLoading = queries.some((q) => q.isInitialLoading)
 
   const data = useMemo(() => {
@@ -159,13 +156,11 @@ export const useTotalInDeposit = (depositNft: DepositNftType) => {
   const shareToken = usePoolShareToken(pool?.address ?? "")
   const totalIssuance = useTotalIssuance(shareToken.data?.token)
 
-  const usd = useUsdPeggedAsset()
-  const spotPrices = useSpotPrices(
+  const spotPrices = useUsdSpotPrices(
     pool?.tokens.map((token) => token.id) ?? [],
-    usd.data?.id,
   )
 
-  const queries = [pools, shareToken, totalIssuance, usd, ...spotPrices]
+  const queries = [pools, shareToken, totalIssuance, ...spotPrices]
   const isLoading = queries.some((q) => q.isInitialLoading)
 
   const data = useMemo(() => {
@@ -209,19 +204,11 @@ export const useTotalInDeposits = (depositNfts: DepositNftType[]) => {
     shareTokens.map((st) => st.data?.token) ?? [],
   )
 
-  const usd = useUsdPeggedAsset()
-  const spotPrices = useSpotPrices(
+  const spotPrices = useUsdSpotPrices(
     pools?.map((pool) => pool.tokens.map((t) => t.id)).flat() ?? [],
-    usd.data?.id,
   )
 
-  const queries = [
-    poolsData,
-    ...shareTokens,
-    ...totalIssuances,
-    usd,
-    ...spotPrices,
-  ]
+  const queries = [poolsData, ...shareTokens, ...totalIssuances, ...spotPrices]
   const isLoading = queries.some((q) => q.isInitialLoading)
 
   const data = useMemo(() => {

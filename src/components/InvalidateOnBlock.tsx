@@ -8,7 +8,7 @@ export const InvalidateOnBlock = (props: { children: ReactNode }) => {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && api) {
       let cancel: () => void
 
       api.rpc.chain

@@ -102,6 +102,12 @@ export const QUERY_KEYS = {
     assetA,
     assetB,
   ],
+  spotPriceUsd: (assetA: string, assetB: string) => [
+    QUERY_KEY_PREFIX,
+    "spotPriceUsd",
+    assetA,
+    assetB,
+  ],
   paymentInfo: (hash: CodecHash, account?: AccountId32 | string) => [
     QUERY_KEY_PREFIX,
     "paymentInfo",
@@ -174,4 +180,5 @@ export const QUERY_KEYS = {
     walletAddress,
   ],
   polkadotAccounts: ["polkadotAccounts"],
+  coingeckoUsd: ["coingeckoUsd"],
 } as const

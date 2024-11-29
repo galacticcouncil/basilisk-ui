@@ -5,13 +5,12 @@ import { u8aToHex } from "@polkadot/util"
 import { decodeAddress } from "@polkadot/util-crypto"
 import { useMutation } from "@tanstack/react-query"
 import { useTokenAccountBalancesList } from "api/accountBalances"
-import { useUsdPeggedAsset } from "api/asset"
 import { useAssetDetailsList } from "api/assetDetails"
 import { useBestNumber } from "api/chain"
 import { DepositNftType } from "api/deposits"
 import { useFarms, useInactiveFarms } from "api/farms"
 import { usePools } from "api/pools"
-import { useSpotPrices } from "api/spotPrice"
+import { useUsdSpotPrices } from "api/spotPrice"
 import BigNumber from "bignumber.js"
 import { ToastMessage, useStore } from "state/store"
 import { useApiPromise } from "utils/api"
@@ -53,8 +52,6 @@ export const useClaimableAmount = (
 
   const allFarms = [...(farms.data ?? []), ...(inactiveFarms.data ?? [])]
 
-  const usd = useUsdPeggedAsset()
-
   const { api } = useApiPromise()
   const accountResolver = getAccountResolver(api.registry)
 
@@ -64,7 +61,7 @@ export const useClaimableAmount = (
 
   const assetList = useAssetDetailsList(assetIds)
 
-  const usdSpotPrices = useSpotPrices(assetIds, usd.data?.id)
+  const usdSpotPrices = useUsdSpotPrices(assetIds)
 
   const accountAddresses =
     allFarms
@@ -83,7 +80,6 @@ export const useClaimableAmount = (
     bestNumberQuery,
     filteredDeposits,
     farms,
-    usd,
     assetList,
     accountBalances,
   ]

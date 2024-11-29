@@ -1,6 +1,5 @@
 import { PoolBase } from "@galacticcouncil/sdk"
-import { useUsdPeggedAsset } from "api/asset"
-import { useSpotPrice, useSpotPrices } from "api/spotPrice"
+import { useUsdSpotPrice, useUsdSpotPrices } from "api/spotPrice"
 import BN from "bignumber.js"
 import { useMemo } from "react"
 import { getFloatingPointAmount } from "utils/balance"
@@ -9,11 +8,10 @@ import { BN_0 } from "utils/constants"
 export const useTotalInPool = (pool: PoolBase) => {
   const [assetA, assetB] = pool.tokens
 
-  const usd = useUsdPeggedAsset()
-  const spotAtoAUSD = useSpotPrice(assetA.id, usd.data?.id)
-  const spotBtoAUSD = useSpotPrice(assetB.id, usd.data?.id)
+  const spotAtoAUSD = useUsdSpotPrice(assetA.id)
+  const spotBtoAUSD = useUsdSpotPrice(assetB.id)
 
-  const queries = [usd, spotAtoAUSD, spotBtoAUSD]
+  const queries = [spotAtoAUSD, spotBtoAUSD]
   const isLoading = queries.some((q) => q.isLoading)
 
   const data = useMemo(() => {
@@ -40,10 +38,10 @@ export const useTotalInPool = (pool: PoolBase) => {
 
 export const useTotalInPools = (pools: PoolBase[]) => {
   const tokens = pools.map(({ tokens }) => tokens.map(({ id }) => id)).flat()
-  const usd = useUsdPeggedAsset()
-  const spotPrices = useSpotPrices(tokens, usd.data?.id)
 
-  const queries = [usd, ...spotPrices]
+  const spotPrices = useUsdSpotPrices(tokens)
+
+  const queries = spotPrices
   const isLoading = queries.some((q) => q.isInitialLoading)
 
   const data = useMemo(() => {

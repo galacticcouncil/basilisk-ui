@@ -6,11 +6,10 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { useUsdPeggedAsset } from "api/asset"
 import { useAssetDetailsList } from "api/assetDetails"
 import { useBestNumber } from "api/chain"
 import { usePools, usePoolShareTokens } from "api/pools"
-import { useSpotPrices } from "api/spotPrice"
+import { useUsdSpotPrices } from "api/spotPrice"
 import { useTotalIssuances } from "api/totalIssuance"
 import BigNumber from "bignumber.js"
 import { Text } from "components/Typography/Text/Text"
@@ -135,11 +134,10 @@ export const useFarmingPositionsData = () => {
   const totalIssuances = useTotalIssuances(
     shareTokens.map((st) => st.data?.token),
   )
-  const usd = useUsdPeggedAsset()
-  const spotPrices = useSpotPrices(
+
+  const spotPrices = useUsdSpotPrices(
     pools.data?.map((pool) => pool.tokens.map((token) => token.id)).flat() ??
       [],
-    usd.data?.id,
   )
 
   const queries = [
@@ -148,7 +146,7 @@ export const useFarmingPositionsData = () => {
     bestNumber,
     assetDetails,
     ...totalIssuances,
-    usd,
+
     ...spotPrices,
   ]
   const isLoading = queries.some((q) => q.isInitialLoading)

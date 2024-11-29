@@ -26,7 +26,7 @@ export const useAssetDetailsList = (
     assetType: ["Token"],
   },
 ) => {
-  const { api } = useApiPromise()
+  const { api, isLoaded } = useApiPromise()
 
   const normalizedIds = ids?.filter(isNotNil).map(normalizeId)
 
@@ -41,6 +41,7 @@ export const useAssetDetailsList = (
         filter.assetType.includes(asset.assetType),
       )
     },
+    enabled: !!isLoaded,
   })
 }
 

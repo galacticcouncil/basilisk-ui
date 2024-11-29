@@ -2,8 +2,7 @@ import { Text } from "components/Typography/Text/Text"
 import { Heading } from "components/Typography/Heading/Heading"
 import { Trans, useTranslation } from "react-i18next"
 import { useVestingScheduleEnd, useVestingTotalVestedAmount } from "api/vesting"
-import { useSpotPrice } from "api/spotPrice"
-import { useUsdPeggedAsset } from "api/asset"
+import { useUsdSpotPrice } from "api/spotPrice"
 import { useMemo } from "react"
 import { css } from "@emotion/react"
 import { theme } from "theme"
@@ -20,8 +19,7 @@ export const WalletVestingHeader = () => {
   const { data: totalVestedAmount } = useVestingTotalVestedAmount()
   const { data: vestingScheduleEnd } = useVestingScheduleEnd()
 
-  const usd = useUsdPeggedAsset()
-  const spotPrice = useSpotPrice(NATIVE_ASSET_ID, usd.data?.id)
+  const spotPrice = useUsdSpotPrice(NATIVE_ASSET_ID)
   const { data: nativeAsset } = useAssetMeta(NATIVE_ASSET_ID)
 
   const totalVestedValue = totalVestedAmount ?? BN_0

@@ -1,8 +1,7 @@
 import { getVolumeAssetTotalValue, useTradeVolumes } from "api/volume"
 import { useMemo } from "react"
 import { BN_0, BN_10 } from "utils/constants"
-import { useSpotPrices } from "api/spotPrice"
-import { useUsdPeggedAsset } from "api/asset"
+import { useUsdSpotPrices } from "api/spotPrice"
 import { useAssetMetaList } from "api/assetMeta"
 import { isNotNil, normalizeId } from "../../../../utils/helpers"
 
@@ -19,9 +18,8 @@ export function usePoolDetailsTradeVolume(poolAddress: string) {
     return { assets: Object.keys(sums), sums }
   }, [volumes, poolAddress])
 
-  const usd = useUsdPeggedAsset()
   const assets = useAssetMetaList(values?.assets ?? [])
-  const spotPrices = useSpotPrices(values?.assets ?? [], usd.data?.id)
+  const spotPrices = useUsdSpotPrices(values?.assets ?? [])
 
   return useMemo(() => {
     if (volumes.some((query) => query.isLoading) || !values) return null
@@ -49,7 +47,6 @@ export function usePoolDetailsTradeVolume(poolAddress: string) {
 
 export function usePoolsDetailsTradeVolumes(poolAddresses: string[]) {
   const volumes = useTradeVolumes(poolAddresses)
-  const usd = useUsdPeggedAsset()
 
   const values = useMemo(() => {
     return poolAddresses.map((poolAddress) => {
@@ -77,9 +74,9 @@ export function usePoolsDetailsTradeVolumes(poolAddresses: string[]) {
   ]
 
   const assets = useAssetMetaList(allAssetsInPools)
-  const spotPrices = useSpotPrices(allAssetsInPools, usd.data?.id)
+  const spotPrices = useUsdSpotPrices(allAssetsInPools)
 
-  const queries = [...volumes, usd, assets, ...spotPrices]
+  const queries = [...volumes, assets, ...spotPrices]
   const isLoading = queries.some((query) => query.isLoading)
 
   const data = useMemo(() => {

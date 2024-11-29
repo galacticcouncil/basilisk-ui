@@ -1,11 +1,11 @@
 import * as liquidityMining from "@galacticcouncil/math-liquidity-mining"
 import { PoolBase } from "@galacticcouncil/sdk"
 import { PalletLiquidityMiningYieldFarmEntry } from "@polkadot/types/lookup"
-import { useAsset, useUsdPeggedAsset } from "api/asset"
+import { useAsset } from "api/asset"
 import { useBestNumber } from "api/chain"
 import { useGlobalFarm, useYieldFarm, useYieldFarms } from "api/farms"
 import { usePools, usePoolShareTokens } from "api/pools"
-import { useSpotPrices } from "api/spotPrice"
+import { useUsdSpotPrices } from "api/spotPrice"
 import { useTotalIssuances } from "api/totalIssuance"
 import BN from "bignumber.js"
 import { useMemo } from "react"
@@ -34,11 +34,10 @@ export const useTotalInPositions = () => {
   const totalIssuances = useTotalIssuances(
     shareTokens.map((st) => st.data?.token),
   )
-  const usd = useUsdPeggedAsset()
-  const spotPrices = useSpotPrices(
+
+  const spotPrices = useUsdSpotPrices(
     pools.data?.map((pool) => pool.tokens.map((token) => token.id)).flat(2) ??
       [],
-    usd.data?.id,
   )
 
   const queries = [
@@ -47,7 +46,6 @@ export const useTotalInPositions = () => {
     yieldFarms,
     ...shareTokens,
     ...totalIssuances,
-    usd,
     ...spotPrices,
   ]
   const isLoading = queries.some((q) => q.isInitialLoading)
@@ -58,7 +56,6 @@ export const useTotalInPositions = () => {
       !deposits.data.positions ||
       !pools.data ||
       !yieldFarms.data ||
-      !usd.data ||
       shareTokens.some((q) => !q.data) ||
       totalIssuances.some((q) => !q.data) ||
       spotPrices.some((q) => !q.data)
@@ -103,7 +100,6 @@ export const useTotalInPositions = () => {
     deposits.data.deposits,
     deposits.data.positions,
     pools.data,
-    usd.data,
     yieldFarms,
     shareTokens,
     totalIssuances,

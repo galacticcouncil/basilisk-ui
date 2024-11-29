@@ -15,7 +15,7 @@ export const useWarningsStore = create(
     (set) => ({
       warnings: {
         depeg: {
-          visible: true,
+          visible: false,
         },
       },
       setWarnings: (key, isOpen) =>
@@ -28,7 +28,7 @@ export const useWarningsStore = create(
     }),
     {
       name: "warnings",
-      version: 0.1,
+      version: 0.2,
       getStorage: () => window.sessionStorage,
     },
   ),

@@ -25,7 +25,9 @@ export const getPoolTotal = (
       new BigNumber(token.balance),
       token.decimals,
     )
+
     const spotPrice = spotPrices.find((sp) => sp?.tokenIn === token.id)
+
     const total = amount.times(spotPrice?.spotPrice ?? BN_0)
 
     return acc.plus(total)

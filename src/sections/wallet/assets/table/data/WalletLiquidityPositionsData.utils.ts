@@ -5,8 +5,7 @@ import { useAssetDetailsList } from "api/assetDetails"
 import { useMemo } from "react"
 import { usePoolsWithShareTokens, useShareOfPools } from "api/pools"
 import BigNumber from "bignumber.js"
-import { useUsdPeggedAsset } from "api/asset"
-import { useSpotPrices } from "api/spotPrice"
+import { useUsdSpotPrices } from "api/spotPrice"
 import { BN_0, BN_1 } from "utils/constants"
 import { calculateFreeBalance, getFloatingPointAmount } from "utils/balance"
 
@@ -24,8 +23,6 @@ export const useLiquidityPositionsTableData = () => {
   })
 
   const assets = useAssetDetailsList(tokenIds)
-
-  const usd = useUsdPeggedAsset()
 
   const poolsWithShareTokens = usePoolsWithShareTokens()
 
@@ -69,13 +66,7 @@ export const useLiquidityPositionsTableData = () => {
     participatedLiquidityPools.map((pool) => pool.shareTokenId ?? "") ?? [],
   )
 
-  const queries = [
-    accountBalances,
-    assetsPool,
-    poolsWithShareTokens,
-    shares,
-    usd,
-  ]
+  const queries = [accountBalances, assetsPool, poolsWithShareTokens, shares]
   const isLoading = queries.some((query) => query.isLoading)
 
   const balances = useMemo(() => {
@@ -151,7 +142,7 @@ export const useLiquidityPositionsTableData = () => {
     ...(balances?.map((balance) => balance.assetB.id) ?? []),
   ]
 
-  const spotPrices = useSpotPrices(currencies, usd.data?.id)
+  const spotPrices = useUsdSpotPrices(currencies)
 
   const data = useMemo(() => {
     if (participatedLiquidityPools && balances && spotPrices) {

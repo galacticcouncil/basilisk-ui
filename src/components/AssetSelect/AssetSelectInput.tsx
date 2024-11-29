@@ -8,8 +8,8 @@ import { SSelectAssetButton } from "./AssetSelectInput.styled"
 import { u32 } from "@polkadot/types"
 import BigNumber from "bignumber.js"
 import { getFloatingPointAmount } from "utils/balance"
-import { useAsset, useUsdPeggedAsset } from "api/asset"
-import { useSpotPrice } from "api/spotPrice"
+import { useAsset } from "api/asset"
+import { useUsdSpotPrice } from "api/spotPrice"
 import { Maybe } from "utils/helpers"
 import { TokenInputContainer, TokenInputMaxButton } from "./TokenInput"
 
@@ -32,9 +32,8 @@ export const AssetSelectInput = (props: {
   disabled?: boolean
 }) => {
   const { t } = useTranslation()
+  const spotPrice = useUsdSpotPrice(props.asset)
 
-  const usd = useUsdPeggedAsset()
-  const spotPrice = useSpotPrice(props.asset, usd.data?.id)
   const asset = useAsset(props.asset)
 
   const aUSDValue = useMemo(() => {

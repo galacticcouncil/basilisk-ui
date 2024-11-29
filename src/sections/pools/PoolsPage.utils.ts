@@ -1,10 +1,9 @@
 import { PoolToken } from "@galacticcouncil/sdk"
 import { u32 } from "@polkadot/types"
-import { useUsdPeggedAsset } from "api/asset"
 import { useTokensBalances } from "api/balances"
 import { useAccountDepositIds, useAllDeposits } from "api/deposits"
 import { usePools, usePoolShareTokens } from "api/pools"
-import { useSpotPrices } from "api/spotPrice"
+import { useUsdSpotPrices } from "api/spotPrice"
 import BN from "bignumber.js"
 import { useMemo } from "react"
 import { useAccountStore } from "state/store"
@@ -28,8 +27,6 @@ export const useFilteredPools = ({ showMyPositions }: PoolsPageFilter) => {
     showMyPositions ? account?.address : undefined,
   )
 
-  const usd = useUsdPeggedAsset()
-
   const poolAssetsId = pools.data?.reduce((acc, pool) => {
     pool.tokens.forEach((token) => {
       if (!acc.includes(token.id)) acc.push(token.id)
@@ -38,12 +35,11 @@ export const useFilteredPools = ({ showMyPositions }: PoolsPageFilter) => {
     return acc
   }, [] as string[])
 
-  const spotPrices = useSpotPrices(poolAssetsId ?? [], usd.data?.id)
+  const spotPrices = useUsdSpotPrices(poolAssetsId ?? [])
 
   const queries = [
     pools,
     accountDeposits,
-    usd,
     ...allDeposits,
     ...spotPrices,
     ...userPoolBalances,
